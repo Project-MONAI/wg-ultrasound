@@ -1,7 +1,7 @@
-# wg-ultrasound
+# wg-ultrasound / Annotation and Anonymization
 
-This repository holds the work-in-progress material for MONAI's ultrasound
-working group.
+This repository holds the work-in-progress material for the ultrasound
+working group's Annotation and Anonymization subgroup.
 
 Join our email list:
 - https://groups.google.com/g/monai-wg-ultrasound

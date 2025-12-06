@@ -1,7 +1,7 @@
-# wg-ultrasound
+# wg-ultrasound / admin
 
-This repository holds the work-in-progress material for MONAI's ultrasound
-working group.
+This repository holds the work-in-progress material for the ultrasound
+working group's overall administration.
 
 Join our email list:
 - https://groups.google.com/g/monai-wg-ultrasound
