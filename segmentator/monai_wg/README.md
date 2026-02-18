@@ -5,15 +5,15 @@ This package provides a standardized evaluation framework for Ultrasound segment
 ## Table of Contents
 - [Installation](#installation)
 - [Modules](#modules)
-    - [Metrics](#metrics)
-    - [Postprocessing](#postprocessing)
-    - [Plotting](#plotting)
+    - [Metrics](#metrics-monai_wgmetrics)
+    - [Postprocessing](#postprocessing-monai_wgpostprocessing)
+    - [Plotting](#plotting-monai_wgplotting)
 - [Usage Examples](#usage-examples)
 
 ## Installation
 Ensure you have the required dependencies:
 ```bash
-pip install monai matplotlib pandas seaborn scikit-learn scikit-image torch torchvision
+pip install monai matplotlib pandas seaborn scikit-learn scipy torch torchvision
 ```
 
 ## Modules

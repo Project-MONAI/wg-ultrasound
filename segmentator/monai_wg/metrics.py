@@ -42,13 +42,22 @@ class MonaiMetricWrapper:
     def _ensure_one_hot(self, tensor, num_classes):
         """
         Ensure the input tensor is in one-hot format (B, C, spatial...).
-        If input is (B, 1, spatial...) or (B, spatial...), it converts to one-hot.
+        
+        The function requires a batch dimension or will auto-batch a (C, H, W) input
+        if C matches the number of classes. It retains use of monai.networks.utils.one_hot
+        for (B, 1, spatial...) inputs.
         """
         if isinstance(tensor, np.ndarray):
             tensor = torch.from_numpy(tensor)
             
-        if tensor.dim() == 3: # (B, H, W) Assuming 2D without channel dim
-             tensor = tensor.unsqueeze(1)
+        if tensor.dim() == 3:
+            # Detect (C, H, W) vs (B, H, W)
+            if tensor.shape[0] == num_classes and num_classes > 1:
+                # Treat as unbatched multi-channel (C, H, W)
+                tensor = tensor.unsqueeze(0)
+            else:
+                # Treat as batched single-channel/indices (B, H, W)
+                tensor = tensor.unsqueeze(1)
              
         if tensor.shape[1] == 1 and num_classes > 1:
             # Assuming tensor contains class indices or binary mask
@@ -71,14 +80,15 @@ class MonaiMetricWrapper:
         y_pred = self._ensure_one_hot(y_pred, self.num_classes)
         y = self._ensure_one_hot(y, self.num_classes)
         
-        # Discretize if needed (assuming probabilities/logits)
         if discretize:
-            if self.num_classes <= 2:
+            if self.num_classes == 2:
+                # Binary: Simple threshold
                 y_pred = (y_pred >= 0.5).float()
             else:
-                # For multi-class, use argmax then re-convert to one-hot
+                # Multi-class: Argmax over channel dimension and convert back to one-hot
+                class_indices = torch.argmax(y_pred, dim=1, keepdim=True)
                 from monai.networks.utils import one_hot
-                y_pred = one_hot(y_pred.argmax(dim=1, keepdim=True), num_classes=self.num_classes)
+                y_pred = one_hot(class_indices, num_classes=self.num_classes)
 
         # Update metrics
         self.dice_metric(y_pred=y_pred, y=y)
@@ -94,19 +104,38 @@ class MonaiMetricWrapper:
         Returns:
             dict: Dictionary of metrics.
         """
+        import warnings
+        
+        def safe_item(metric_obj, name):
+            val = metric_obj.aggregate()
+            # Handle ConfusionMatrixMetric which returns a list
+            if isinstance(val, (list, tuple)):
+                results = []
+                for v in val:
+                    if torch.isfinite(v).all():
+                        results.append(v.item())
+                    else:
+                        warnings.warn(f"Non-finite value detected in {name}")
+                        results.append(0.0)
+                return results
+            
+            if torch.isfinite(val).all():
+                return val.item()
+            else:
+                warnings.warn(f"Non-finite value detected in {name}")
+                return 0.0
+
         metrics = {
-            "Dice": self.dice_metric.aggregate().item(),
-            "IoU": self.iou_metric.aggregate().item(),
-            "HD95": self.hd95_metric.aggregate().item(),
-            "ASD": self.asd_metric.aggregate().item(),
+            "Dice": safe_item(self.dice_metric, "Dice"),
+            "IoU": safe_item(self.iou_metric, "IoU"),
+            "HD95": safe_item(self.hd95_metric, "HD95"),
+            "ASD": safe_item(self.asd_metric, "ASD"),
         }
         
-        # Confusion matrix returns list of [precision, recall]
-        cm_results = self.confusion_matrix.aggregate()
-        # cm_results is usually a list of tensors if multiple metrics requested
-        # For precision and recall:
-        metrics["Precision"] = cm_results[0].item()
-        metrics["Recall"] = cm_results[1].item()
+        cm_results = safe_item(self.confusion_matrix, "ConfusionMatrix")
+        if isinstance(cm_results, list) and len(cm_results) >= 2:
+            metrics["Precision"] = cm_results[0]
+            metrics["Recall"] = cm_results[1]
         
         return metrics
 

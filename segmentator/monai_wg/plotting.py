@@ -93,7 +93,7 @@ def plot_segmentation(image, label, pred, alpha=0.5, save_path=None, title="Segm
     else:
         plt.show()
 
-def plot_metric_distribution(metrics_df, metric_names=['Dice', 'IoU'], save_path=None):
+def plot_metric_distribution(metrics_df, metric_names=None, save_path=None):
     """
     Plots the distribution of metrics using Violin plots.
 
@@ -103,6 +103,8 @@ def plot_metric_distribution(metrics_df, metric_names=['Dice', 'IoU'], save_path
         metric_names (list[str], optional): List of column names to plot. Defaults to ['Dice', 'IoU'].
         save_path (str, optional): Path to save the figure if provided.
     """
+    if metric_names is None:
+        metric_names = ['Dice', 'IoU']
     plt.figure(figsize=(12, 6))
     melted_df = metrics_df.melt(value_vars=metric_names, var_name='Metric', value_name='Score')
     
@@ -136,7 +138,7 @@ def plot_metric_correlation(metrics_df, x_metric='Dice', y_metric='HD95', save_p
     else:
         plt.show()
 
-def plot_model_comparison(comparison_df, metrics=['Dice', 'IoU'], save_path=None):
+def plot_model_comparison(comparison_df, metrics=None, save_path=None):
     """
     Compares multiple models across several metrics using a Grouped Bar chart.
 
@@ -146,6 +148,8 @@ def plot_model_comparison(comparison_df, metrics=['Dice', 'IoU'], save_path=None
         metrics (list[str], optional): Metrics to include in the comparison. Defaults to ['Dice', 'IoU'].
         save_path (str, optional): Path to save the figure if provided.
     """
+    if metrics is None:
+        metrics = ['Dice', 'IoU']
     # If comparison_df is not in long format, melt it
     if 'Metric' not in comparison_df.columns:
         # Assuming 'Model' is a column and the metrics are other columns
@@ -238,7 +242,7 @@ def plot_summary_report(metrics_df, overlay_info=None, save_path=None):
     else:
         plt.show()
 
-def plot_radar_chart(comparison_df, metrics=['Dice', 'IoU', 'Precision', 'Recall'], save_path=None):
+def plot_radar_chart(comparison_df, metrics=None, save_path=None):
     """
     Plots a Radar (Spider) chart comparing models across multiple metrics.
     Very common in SOTA papers to show balanced performance.
@@ -248,6 +252,8 @@ def plot_radar_chart(comparison_df, metrics=['Dice', 'IoU', 'Precision', 'Recall
         metrics (list[str], optional): Metrics to plot. Defaults to ['Dice', 'IoU', 'Precision', 'Recall'].
         save_path (str, optional): Path to save the figure if provided.
     """
+    if metrics is None:
+        metrics = ['Dice', 'IoU', 'Precision', 'Recall']
     from math import pi
     
     # Preprocess data: assume Model is index/column, metrics are columns
@@ -310,16 +316,18 @@ def plot_dice_cdf(metrics_df, metric_name='Dice', save_path=None):
     else:
         plt.show()
 
-def plot_pixel_confusion_matrix(y_true, y_pred, labels=[0, 1], save_path=None):
+def plot_pixel_confusion_matrix(y_true, y_pred, labels=None, save_path=None):
     """
     Plots a pixel-wise confusion matrix for a single sample.
 
     Args:
         y_true (np.ndarray | torch.Tensor): Ground truth labels. Expected shape (H, W).
         y_pred (np.ndarray | torch.Tensor): Predicted labels. Expected shape (H, W).
-        labels (list[int], optional): Class labels. Defaults to [0, 1].
+        labels (list[int/str], optional): Class labels or names. Defaults to [0, 1].
         save_path (str, optional): Path to save the figure if provided.
     """
+    if labels is None:
+        labels = [0, 1]
     from sklearn.metrics import confusion_matrix
     
     y_true_flat = np.squeeze(y_true).flatten()
@@ -330,9 +338,14 @@ def plot_pixel_confusion_matrix(y_true, y_pred, labels=[0, 1], save_path=None):
     cm_sum = cm.sum(axis=1)[:, np.newaxis]
     cm_norm = np.divide(cm.astype('float'), cm_sum, out=np.zeros_like(cm.astype('float')), where=cm_sum!=0)
     
+    # Define display labels
+    display_labels = [str(lab) for lab in labels]
+    if len(display_labels) == 2 and labels == [0, 1]:
+        display_labels = ['BG', 'Target']
+        
     plt.figure(figsize=(6, 5))
     sns.heatmap(cm_norm, annot=True, fmt='.2f', cmap='Blues', 
-                xticklabels=['BG', 'Target'], yticklabels=['BG', 'Target'])
+                xticklabels=display_labels, yticklabels=display_labels)
     plt.ylabel('Actual')
     plt.xlabel('Predicted')
     plt.title("Pixel-wise Confusion Matrix")
@@ -342,6 +355,16 @@ def plot_pixel_confusion_matrix(y_true, y_pred, labels=[0, 1], save_path=None):
         plt.close()
     else:
         plt.show()
+
+def _get_binary_mask(m, idx):
+    """Internal helper to extract a binary mask for a specific class."""
+    m = np.squeeze(m)
+    if m.ndim == 3:  # One-hot (C, H, W)
+        if idx < 0 or idx >= m.shape[0]:
+            raise ValueError(f"_get_binary_mask: class_index {idx} is out of bounds for tensor with {m.shape[0]} channels.")
+        return m[idx] > 0.5
+    # Single channel or already squeezed
+    return m == idx if m.max() > 1 else m > 0.5
 
 def plot_segmentation_error_heatmap(image, label, pred, class_index=1, save_path=None):
     """
@@ -369,18 +392,8 @@ def plot_segmentation_error_heatmap(image, label, pred, class_index=1, save_path
         if image.shape[-1] == 1:  # (H, W, 1)
             image = np.squeeze(image, axis=-1)
 
-    # Handle mask shapes/channels
-    def get_binary_mask(m, idx):
-        m = np.squeeze(m)
-        if m.ndim == 3:  # One-hot (C, H, W)
-            # Clip index to avoid out of bounds if C=1 and idx=1
-            idx = min(idx, m.shape[0] - 1)
-            return m[idx] > 0.5
-        # Single channel or already squeezed
-        return m == idx if m.max() > 1 else m > 0.5
-
-    label_bin = get_binary_mask(label, class_index)
-    pred_bin = get_binary_mask(pred, class_index)
+    label_bin = _get_binary_mask(label, class_index)
+    pred_bin = _get_binary_mask(pred, class_index)
     
     tp = np.logical_and(label_bin, pred_bin)
     fp = np.logical_and(np.logical_not(label_bin), pred_bin)
@@ -458,10 +471,11 @@ def plot_performance_vs_size(metrics_df, save_path=None):
         metrics_df (pd.DataFrame): DataFrame containing 'Size' and 'IoU' columns.
         save_path (str, optional): Path to save the figure if provided.
     """
-    plt.figure(figsize=(8, 6))
     if 'Size' not in metrics_df.columns:
         # If size is not present, skip
         return
+        
+    plt.figure(figsize=(8, 6))
         
     sns.scatterplot(data=metrics_df, x='Size', y='IoU', alpha=0.6)
     plt.title("Segmentation Performance vs Object Size")
@@ -474,7 +488,7 @@ def plot_performance_vs_size(metrics_df, save_path=None):
     else:
         plt.show()
 
-def plot_training_history(history_df, metrics=['Loss', 'Dice'], save_path=None):
+def plot_training_history(history_df, metrics=None, save_path=None):
     """
     Plots Training vs Validation curves (Loss, Dice, etc.).
 
@@ -483,6 +497,8 @@ def plot_training_history(history_df, metrics=['Loss', 'Dice'], save_path=None):
         metrics (list[str], optional): Metrics to include. Defaults to ['Loss', 'Dice'].
         save_path (str, optional): Path to save the figure if provided.
     """
+    if metrics is None:
+        metrics = ['Loss', 'Dice']
     n_metrics = len(metrics)
     fig, axes = plt.subplots(1, n_metrics, figsize=(6 * n_metrics, 5))
     if n_metrics == 1: axes = [axes]
