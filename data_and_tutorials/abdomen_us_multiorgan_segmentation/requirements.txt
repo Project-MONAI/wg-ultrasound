@@ -8,14 +8,14 @@
 # This file is for non-Kaggle environments (Colab, local). Kaggle's notebook
 # images come with all of these pre-installed and ignore this file.
 
-monai>=1.3.0
+monai>=1.5.2
 nibabel>=5.0
 scikit-learn>=1.3
 scikit-image>=0.21
 pandas>=2.0
 numpy>=1.24
 matplotlib>=3.7
-Pillow>=10.0
+Pillow>=12.2.0
 tqdm>=4.65
 kagglehub>=0.2
-pyarrow>=14.0   # for parquet manifest reading/writing if you switch from CSV
+pyarrow>=14.0.1   # for parquet manifest reading/writing if you switch from CSV

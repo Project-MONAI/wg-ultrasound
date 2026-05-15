@@ -10,12 +10,10 @@ A two-notebook tutorial for the [MONAI Ultrasound Working Group](https://github.
 
 | File | Purpose |
 |---|---|
-| `abdomen_us_v1_baseline.ipynb` | V1 baseline. Plain `DiceCELoss`. Demonstrates mode collapse onto liver. |
-| `abdomen_us_v2_class_weighted.ipynb` | V2 fix. Class-weighted `DiceCELoss`. Recovers five organs from 0.0 Dice. |
+| `abdomen_us_v1_baseline.ipynb` | V1 (liver-only) baseline. Plain `DiceCELoss`. Demonstrates mode collapse onto liver. |
+| `abdomen_us_v2_class_weighted.ipynb` | V2 (all organs). Class-weighted `DiceCELoss`. Recovers five organs from 0.0 Dice. |
 | `requirements.txt` | Python dependencies for non-Kaggle environments. |
 | `results/` | Per-organ Dice plots and prediction visualizations from sample runs. |
-
-The two notebooks are nearly identical. They share the same data pipeline, model, training loop, and evaluation. They differ in exactly one cell — the loss definition in §8.
 
 ---
 
@@ -37,7 +35,7 @@ Trained on 510 synthetic ultrasound images (AUS), validated on 130 held-out subj
 
 ¹ NaN means the class has no annotated pixels in any RUS test image — the dataset's RUS test set doesn't include those organs, so Dice is undefined.
 
-**The headline:** V1 collapsed onto liver. V2 recovered gallbladder, kidney, pancreas, and spleen — without sacrificing liver performance. Mean foreground Dice nearly tripled (0.087 → 0.250). Three classes (bone, vessels, adrenal) remain at 0.0 because they're too rare in the training data even with up-weighting; addressing them would require sampling-strategy changes beyond the scope of this tutorial.
+**The headline:** V1 collapsed onto liver-only. V2 recovered gallbladder, kidney, pancreas, and spleen — without sacrificing liver performance. Mean foreground Dice nearly tripled (0.087 → 0.250). Three classes (bone, vessels, adrenal) remain at 0.0 because they're too rare in the training data even with up-weighting; addressing them would require sampling-strategy changes beyond the scope of this tutorial.
 
 ![V1 vs V2 per-organ Dice comparison](results/v2_per_organ_dice.png)
 
@@ -59,7 +57,7 @@ Trained on 510 synthetic ultrasound images (AUS), validated on 130 held-out subj
 2. Set runtime to GPU: `Runtime → Change runtime type → T4 GPU`.
 3. Set up Kaggle API credentials so `kagglehub` can download the dataset:
    - Get your Kaggle API token from your Kaggle account settings (`kaggle.json`).
-   - In Colab, run: `from google.colab import userdata; os.environ['KAGGLE_USERNAME'] = userdata.get('KAGGLE_USERNAME'); os.environ['KAGGLE_KEY'] = userdata.get('KAGGLE_KEY')` after adding them to Colab's "Secrets" panel.
+   - In Colab, run: `import os; from google.colab import userdata; os.environ['KAGGLE_USERNAME'] = userdata.get('KAGGLE_USERNAME'); os.environ['KAGGLE_KEY'] = userdata.get('KAGGLE_KEY')` after adding them to Colab's "Secrets" panel.
 4. Run All.
 
 ### Locally
@@ -116,8 +114,7 @@ If you use this dataset, cite the original paper:
 
 > Vitale S, Orlando JI, Iarussi E, Larrabide I. *Improving realism in patient-specific abdominal ultrasound simulation using CycleGANs.* International Journal of Computer Assisted Radiology and Surgery 15(2):183–192, 2020.
 
-If you use this tutorial in your work, citing this folder URL inside the WG repository is appreciated.
-
+If you use this tutorial in your work, citing this folder URL inside the WG repository is appreciated but not required.
 ---
 
 ## Acknowledgements
