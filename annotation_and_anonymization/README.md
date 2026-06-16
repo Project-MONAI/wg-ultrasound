@@ -1,17 +1,33 @@
 # wg-ultrasound / Annotation and Anonymization
 
-This repository holds the work-in-progress material for the ultrasound
-working group's Annotation and Anonymization subgroup.
+> Work-in-progress material for the ultrasound working group's **Annotation and Anonymization** subgroup.
 
-**Our [google doc](https://docs.google.com/document/d/1iKNylVIwgFbmesYX5Ux2O5cx_NsBu0G_eX6k1e6c_aA/edit?usp=sharing)  that holds pros and cons of annotation and anonymization solutions. Feel free to add!**
+---
 
-General info: 
+## Repository contents
 
-Join our email list:
-- https://groups.google.com/g/monai-wg-ultrasound
+| Resource | Description |
+| -------- | ----------- |
+| [deid_tools.md](deid_tools.md) | Comparison of de-identification tools for DICOM metadata anonymization and burned-in pixel PHI removal, with pros, cons, and subgroup evaluation notes. |
+| [deid_datasets.md](deid_datasets.md) | Catalog of datasets with synthetic PHI and clean ultrasound sources suitable for PHI injection, with links and usage notes. |
+| [phase1_synthetic_phi.ipynb](phase1_synthetic_phi.ipynb) | Phase 1 synthetic PHI pipeline notebook: burns known synthetic identifiers into lung POCUS images, writes multi-frame DICOMs, and produces ground-truth overlay manifests for testing de-id tools. |
+| [ED01_z07_Lung_zone_7.dcm.zip](ED01_z07_Lung_zone_7.dcm.zip) | Sample output from the Phase 1 pipeline: an 87-frame lung ultrasound DICOM with planted synthetic PHI in pixels and headers, for quick inspection or de-id tool benchmarking. |
 
-Join our slack channel:
-- https://join.slack.com/t/projectmonai/shared_invite/zt-3hucgm02q-i8Bn9XofDZs2UGOH4jUl4w
+---
 
-Visit our website:
-- https://project-monai.github.io/wg_ultrasound.html
+## General info
+
+- **Email list** — [monai-wg-ultrasound](https://groups.google.com/g/monai-wg-ultrasound)
+- **Slack** — [Join the channel](https://join.slack.com/t/projectmonai/shared_invite/zt-3hucgm02q-i8Bn9XofDZs2UGOH4jUl4w)
+- **Website** — [project-monai.github.io/wg_ultrasound](https://project-monai.github.io/wg_ultrasound.html)
+
+---
+
+## Contributors
+
+| | |
+| --- | --- |
+| Deepa Krishnaswamy | Lakshmi Mahabaleshwara |
+| Tamas Ungi | Dave Dinh |
+| Joel Jacob Tomson | Luv Kohli |
+| Sharanya Balachandran | Shuhei Misawa |
