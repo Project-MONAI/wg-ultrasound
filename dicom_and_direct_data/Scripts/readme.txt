@@ -1,0 +1,1 @@
+python -m ipykernel install --user --name=monai_d3 --display-name "Python (monai_d3)"
