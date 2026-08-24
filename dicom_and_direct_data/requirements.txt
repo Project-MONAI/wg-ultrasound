@@ -6,3 +6,5 @@ SimpleITK
 gdcm
 openpyxl
 matplotlib
+monai
+torch
