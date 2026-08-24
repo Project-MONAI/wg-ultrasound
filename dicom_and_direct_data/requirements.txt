@@ -1,0 +1,10 @@
+pydicom
+pylibjpeg
+pylibjpeg-libjpeg
+pylibjpeg-openjpeg
+SimpleITK
+gdcm
+openpyxl
+matplotlib
+monai
+torch
