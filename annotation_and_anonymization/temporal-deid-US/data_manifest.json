@@ -1,0 +1,40 @@
+{
+  "schema": 1,
+  "about": "Inputs of the Phase 2 evaluation. Empty 'files' lists are resolved by the selection rule and recorded in results/resolved_manifest.json; run scripts/freeze_manifest.py to pin them (exact objects + SHA-256). No data are redistributed with this code.",
+  "sources": {
+    "A": {
+      "title": "Aliza Medical Imaging public DICOM samples",
+      "homepage": "https://www.aliza-dicom-viewer.com/download/datasets",
+      "license": "Free sample data published by Aliza Medical Imaging; check the publisher's terms before redistribution (not redistributed here).",
+      "files": [
+        {"name": "GE_3Dt_EnhancedUSVolume", "gdrive_id": "13e72horzsEoSPxIWOzyqR34FyfPzqbzS", "sha256": null},
+        {"name": "Philips_2Dt_JPEG", "gdrive_id": "0ByBLJ2-U1t9xWHczTkhDMVZST3M", "sha256": null},
+        {"name": "Acuson_2Dt_JPEG_a", "gdrive_id": "1lnBncTzNwMG4Gr0im5WE9vC87XMoqUfK", "sha256": null},
+        {"name": "Acuson_2Dt_JPEG_b", "gdrive_id": "1qjyvGanhUyhDt92KfEWXDVCdOYYIz30w", "sha256": null},
+        {"name": "GE_2Dt_RLE", "gdrive_id": "1vouULQY6_sNmkuxpqklRLT3i45RF0Bsl", "sha256": null}
+      ]
+    },
+    "B": {
+      "title": "TCIA B-mode-and-CEUS-Liver",
+      "collection": "B-mode-and-CEUS-Liver",
+      "doi": "10.7937/TCIA.2021.v4z7-tc39",
+      "license": "CC BY 4.0 (cite the collection DOI and TCIA)",
+      "selection": {"max_mean_instance_MB": 60, "one_series_per_patient": true, "max_checked_per_series": 6, "max_per_series": 2, "multiframe_only": true},
+      "files": []
+    },
+    "C": {
+      "title": "TCIA MIDI-B Synthetic Validation (US)",
+      "collection": "MIDI-B-Synthetic-Validation",
+      "doi": "10.7937/cf2p-aw56",
+      "license": "CC BY 4.0 (cite Rutherford et al. 2025 and TCIA)",
+      "selection": {"one_series_per_patient": false, "max_checked_per_series": 3, "max_per_series": 3},
+      "files": []
+    },
+    "P1": {
+      "title": "wg-ultrasound Phase 1 sample (ED01_z07_Lung_zone_7)",
+      "url": "https://raw.githubusercontent.com/Project-MONAI/wg-ultrasound/main/annotation_and_anonymization/ED01_z07_Lung_zone_7.dcm.zip",
+      "license": "Apache-2.0 (repository); synthetic PHI on OpenPOCUS images",
+      "sha256": null
+    }
+  }
+}
