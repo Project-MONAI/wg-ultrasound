@@ -1,0 +1,17 @@
+# Works on Google Colab without a runtime restart (Colab's numpy / pandas / matplotlib are kept; versions used are
+# written to results/environment.json). Python 3.10-3.12. System tools: ffmpeg/ffprobe; Java 11+ only for CTP.
+pydicom==3.0.2
+pylibjpeg==2.1.0
+pylibjpeg-libjpeg==2.5.0
+pylibjpeg-openjpeg==2.6.0
+dicom-anonymizer==2.0.0
+deid==0.4.13
+dicognito==0.19.0
+gdown==6.5.1
+numpy>=1.26
+pandas>=2.1
+matplotlib>=3.8
+pillow>=10
+# RSNA Anonymizer needs pydicom 2.4, so it goes in its own environment (the notebook does this on Colab):
+#   python -m venv .venv-rsna && .venv-rsna/bin/pip install rsna-anonymizer==19.0.10 easyocr==1.7.2 pydicom==2.4.4
+#   then set RSNA_PYTHON=.venv-rsna/bin/python
